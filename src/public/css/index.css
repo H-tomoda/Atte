@@ -67,3 +67,18 @@
     padding: 12px;
     width: 20%;
 }
+.attendance__panel{
+    display: flex;
+    justify-content: center;
+    border: solid;
+    padding: 20px 50px;
+    border-radius: 10px;
+}
+.clock{
+    font-size: 100px;
+    text-align: center;
+}
+.date{
+    font-size: 50px;
+    text-align: center;
+}
