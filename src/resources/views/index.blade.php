@@ -6,7 +6,13 @@
 
 @section('content')
 <div class="attendance__alert">
-    // メッセージ機能
+    @if(count($errors)>0)
+    <ul>
+        @foreach ($errors ->all() as $error)
+        <li>{{$error}}</li>
+        @endforeach
+    </ul>
+    @endif
 </div>
 
 <div class="attendance__content">
