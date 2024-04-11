@@ -25,6 +25,9 @@
                             <a class="header-nav__link" href="/atte">日別勤務一覧</a>
                         </li>
                         <li class="header-nav__item">
+                            <a class="header-nav__link" href="/attendances">日別全体勤務一覧</a>
+                        </li>
+                        <li class="header-nav__item">
                             <form class="form" action="/logout" method="post">
                                 @csrf
                                 <button class="header-nav__button">ログアウト</button>

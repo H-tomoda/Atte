@@ -6,6 +6,7 @@
 
 @section('content')
 
+@foreach ($attendances as $date => $dateAttendances)
 <table class="table">
     <thead>
         <tr>
@@ -18,11 +19,10 @@
         </tr>
     </thead>
     <tbody>
-        @foreach ($groupedAttendances as $date => $attendances)
         <tr>
             <th colspan="6" class="date">{{ $date }}</th>
         </tr>
-        @foreach ($attendances as $attendance)
+        @foreach ($dateAttendances as $attendance)
         <tr>
             <td>{{$loop -> iteration}}</td>
             <td scope="col">{{ $attendance -> user->name}}</td>

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class AttendanceController extends Controller
 {
@@ -23,7 +24,7 @@ class AttendanceController extends Controller
 
             // 過去の勤怠データを確認
             $existingAttendance = Attendance::where('user_id', $user->id)
-                ->whereDate('clock_in', today()) // 今日の日付の勤怠データを確認
+                ->whereDate('clock_in', Carbon::today()) // 今日の日付の勤怠データを確認
                 ->whereNull('clock_out') //退勤していないかの確認
                 ->first();
 
@@ -47,7 +48,7 @@ class AttendanceController extends Controller
         $user = Auth::user();
         // 過去の勤怠データを確認
         $attendance = Attendance::where('user_id', $user->id)
-            ->whereDate('clock_in', today()) // 今日の日付の勤怠データを確認
+            ->whereDate('clock_in', Carbon::today()) // 今日の日付の勤怠データを確認
             ->whereNull('clock_out') // 退勤していない勤怠データを確認
             ->first();
 
@@ -65,7 +66,7 @@ class AttendanceController extends Controller
         $attendances = $user->attendances()->orderBy('clock_in', 'desc')->get();
 
         $attendances->transform(function ($attendance) {
-            $attendance->clock_in = \Carbon\Carbon::parse($attendance->clock_in);
+            $attendance->clock_in = Carbon::parse($attendance->clock_in);
             return $attendance;
         });
         // 日付ごとにグループ化
@@ -74,5 +75,17 @@ class AttendanceController extends Controller
         });
         // compact() 関数で変数をビューに渡す
         return view('atte', compact('groupedAttendances'));
+    }
+    public function attendances()
+    {
+        // すべての勤怠データを取得し、日付ごとにグループ化する
+        $attendances = Attendance::orderBy('clock_in', 'desc')->get()->groupBy(function ($attendance) {
+            // Carbonインスタンスに変換
+            $carbonDate = Carbon::parse($attendance->clock_in);
+            // toDatestring() を呼び出す
+            return $carbonDate->toDateString();
+        });
+        // ビューにグループ化された勤怠データを渡す
+        return view('attendances', compact('attendances'));
     }
 }
