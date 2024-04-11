@@ -59,4 +59,20 @@ class AttendanceController extends Controller
         $attendance->save();
         return redirect()->back();
     }
+    public function atte()
+    {
+        $user = Auth::user();
+        $attendances = $user->attendances()->orderBy('clock_in', 'desc')->get();
+
+        $attendances->transform(function ($attendance) {
+            $attendance->clock_in = \Carbon\Carbon::parse($attendance->clock_in);
+            return $attendance;
+        });
+        // 日付ごとにグループ化
+        $groupedAttendances = $attendances->groupBy(function ($attendance) {
+            return $attendance->clock_in->toDatestring();
+        });
+        // compact() 関数で変数をビューに渡す
+        return view('atte', compact('groupedAttendances'));
+    }
 }

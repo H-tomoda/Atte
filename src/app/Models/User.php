@@ -41,4 +41,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+    // User モデルに attendances() メソッドを追加
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
 }
