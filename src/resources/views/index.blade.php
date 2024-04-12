@@ -36,29 +36,7 @@
             <button type="button" class="btn btn-danger">再入</button>
         </form>
     </div>
-    <table>
-        <tr>
-            <th>名前</th>
-            <th>勤務開始</th>
-            <th>勤務終了</th>
-            <th>休憩時間</th>
-            <th>勤務時間</th>
-        </tr>
-        <tr>
-            <td>サンプル太郎</td>
-            <td>09:30</td>
-            <td>20:00</td>
-            <td>00:30</td>
-            <td>08:00</td>
-        </tr>
-        <tr>
-            <td>サンプル太郎</td>
-            <td>09:30</td>
-            <td>20:00</td>
-            <td>00:30</td>
-            <td>08:00</td>
-        </tr>
-    </table>
+
     <script>
         function updateClock() {
             var now = new Date();

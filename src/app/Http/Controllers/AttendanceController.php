@@ -26,12 +26,13 @@ class AttendanceController extends Controller
             $existingAttendance = Attendance::where('user_id', $user->id)
                 ->whereDate('clock_in', Carbon::today()) // 今日の日付の勤怠データを確認
                 ->whereNull('clock_out') //退勤していないかの確認
-                ->first();
+                ->first(); // 一つのデータのみを取得するため first() を使用する
 
-            // すでに出勤済みの場合はエラーを返す
-            if ($existingAttendance) {
+            // 同一の日に出勤している場合はエラーとする
+            if ($existingAttendance !== null) {
                 return back()->withErrors(['message' => '既に出勤しています']);
             }
+            // 出勤データが存在しない場合に新しい出勤データを生成
             $attendance = new Attendance();
             $attendance->user_id = $user->id;
             $attendance->clock_in = now();
@@ -46,19 +47,29 @@ class AttendanceController extends Controller
     public function clockOut(Request $request)
     {
         $user = Auth::user();
-        // 過去の勤怠データを確認
-        $attendance = Attendance::where('user_id', $user->id)
-            ->whereDate('clock_in', Carbon::today()) // 今日の日付の勤怠データを確認
-            ->whereNull('clock_out') // 退勤していない勤怠データを確認
-            ->first();
-
-        // 退勤済みの場合はエラーを返す
-        if (!$attendance) {
-            return back()->withErrors(['message' => '出勤していないか、既に退勤済みです']);
+        try {
+            DB::beginTransaction();
+            // 過去の勤怠データを確認
+            $attendance = Attendance::where('user_id', $user->id)
+                ->whereDate('clock_in', Carbon::today()) // 今日の日付の勤怠データを確認
+                ->whereNull('clock_out') // 退勤していない勤怠データを確認
+                ->first();
+            // 出勤していない場合はエラーを返す
+            if (!$attendance) {
+                return back()->withErrors(['message' => '出勤データがありません']);
+            }
+            // 退勤していない場合はエラーを返す
+            if (!$attendance->clock_out) {
+                return back()->withErrors(['message' => '出勤していないか、既に退勤済みです']);
+            }
+            $attendance->clock_out = now();
+            $attendance->save();
+            DB::commit();
+            return redirect()->back();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors(['message' => $e->getMessage()]);
         }
-        $attendance->clock_out = now();
-        $attendance->save();
-        return redirect()->back();
     }
     public function atte()
     {
@@ -85,7 +96,15 @@ class AttendanceController extends Controller
             // toDatestring() を呼び出す
             return $carbonDate->toDateString();
         });
+        // 各日付ごとのグループをページネーションする
+        $paginatedAttendances = new \Illuminate\Pagination\LengthAwarePaginator(
+            $attendances->forPage(\Illuminate\Pagination\Paginator::resolveCurrentPage(), 10),
+            $attendances->count(),
+            10,
+            null,
+            ['path' => \illuminate\Pagination\Paginator::resolveCurrentPage()]
+        );
         // ビューにグループ化された勤怠データを渡す
-        return view('attendances', compact('attendances'));
+        return view('attendances', compact('paginatedAttendances'));
     }
 }

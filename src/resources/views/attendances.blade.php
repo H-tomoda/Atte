@@ -6,7 +6,7 @@
 
 @section('content')
 
-@foreach ($attendances as $date => $dateAttendances)
+@foreach ($paginatedAttendances as $date => $dateAttendances)
 <table class="table">
     <thead>
         <tr>
@@ -32,7 +32,8 @@
             <td scope="col">勤務時間</td>
         </tr>
         @endforeach
-        @endforeach
     </tbody>
 </table>
+@endforeach
+{{$paginatedAttendances->links()}}
 @endsection
