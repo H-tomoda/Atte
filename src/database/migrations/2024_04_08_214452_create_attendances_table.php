@@ -19,6 +19,7 @@ class CreateAttendancesTable extends Migration
             $table->string('status')->default('出勤中'); //ステータスカラム追加
             $table->dateTime('clock_in');
             $table->dateTime('clock_out')->nullable();
+            $table->integer('daily_attendance_count')->default(0); //出勤回数カウント
             $table->timestamps();
         });
     }
