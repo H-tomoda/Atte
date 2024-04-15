@@ -25,15 +25,15 @@
         </form>
         <form class="attendance__button" action="/attendance/clock-out" method="post">
             @csrf
-            <button type="submit" class="btn btn-secondary">勤務終了</button>
+            <button type="submit" class="btn btn-secondary" id="clockOutButton">勤務終了</button>
         </form>
-        <form class="attendance__button" action="/attendance/clock-out" method="post">
+        <form class="attendance__button" action="{{route('break.start')}}" method="post">
             @csrf
-            <button type="button" class="btn btn-success">外出</button>
+            <button type="submit" class="btn btn-success" id="startBreakButton">休憩開始</button>
         </form>
-        <form class="attendance__button" action="/attendance/clock-out" method="post">
+        <form class="attendance__button" action="{{route('break.end')}}" method="post">
             @csrf
-            <button type="button" class="btn btn-danger">再入</button>
+            <button type="submit" class="btn btn-danger" id="endBreakButton">休憩終了</button>
         </form>
     </div>
 
@@ -58,5 +58,15 @@
 
         // 1秒ごとに更新
         setInterval(updateClock, 1000);
+
+        //退勤ボタンがクリックされた時の処理
+        document.getElementById('clockOutButton').addEventListener('click', function() {
+            //ボタンの取得
+            var startBreakButton = document.getElementById('startBreakButton');
+            var endBreakButton = document.getElementById('endBreakButton');
+            //ボタンの無効化
+            startBreakButton.disabled = true;
+            endBreakButton.disabled = true;
+        });
     </script>
     @endsection

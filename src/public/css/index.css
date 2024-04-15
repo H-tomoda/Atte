@@ -82,3 +82,9 @@
     font-size: 50px;
     text-align: center;
 }
+.disabled {
+    opacity: 0.5;
+    /*グレーアウト時の不透明度を下げる */
+    pointer-events: none;
+    /*ボタンの無効化 */
+}

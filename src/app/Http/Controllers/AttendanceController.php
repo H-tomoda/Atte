@@ -22,16 +22,16 @@ class AttendanceController extends Controller
         try {
             DB::beginTransaction();
 
-            // 過去の勤怠データを確認
-            $existingAttendance = Attendance::where('user_id', $user->id)
-                ->whereDate('clock_in', Carbon::today()) // 今日の日付の勤怠データを確認
-                ->whereNull('clock_out') //退勤していないかの確認
-                ->first(); // 一つのデータのみを取得するため first() を使用する
-
-            // 同一の日に出勤している場合はエラーとする
-            if ($existingAttendance !== null) {
-                return back()->withErrors(['message' => '既に出勤しています']);
+            //その日の出勤回数を取得
+            $todayAttendances = Attendance::where('user_id', $user->id)
+                ->whereDate('clock_in', Carbon::today())
+                ->count();
+            //1日2回目の出勤にエラーで返す
+            if ($todayAttendances >= 1) {
+                return back()->withErrors(['message' => '1日複数回の出勤を制限しています。管理者にお問合せ下さい']);
             }
+
+
             // 出勤データが存在しない場合に新しい出勤データを生成
             $attendance = new Attendance();
             $attendance->user_id = $user->id;
@@ -49,19 +49,19 @@ class AttendanceController extends Controller
         $user = Auth::user();
         try {
             DB::beginTransaction();
-            // 過去の勤怠データを確認
-            $attendance = Attendance::where('user_id', $user->id)
-                ->whereDate('clock_in', Carbon::today()) // 今日の日付の勤怠データを確認
-                ->whereNull('clock_out') // 退勤していない勤怠データを確認
-                ->first();
-            // 出勤していない場合はエラーを返す
+            //ユーザーの最新出勤レコードを確認
+            $attendance = Attendance::where('user_id', $user->id)->latest()->first();
+            //出勤していない場合、エラーを返す
             if (!$attendance) {
                 return back()->withErrors(['message' => '出勤データがありません']);
             }
-            // 退勤していない場合はエラーを返す
-            if (!$attendance->clock_out) {
-                return back()->withErrors(['message' => '出勤していないか、既に退勤済みです']);
+            //既に退勤済みの場合、エラーを返す
+            if ($attendance->clock_out) {
+                return back()->withErrors(['message' => '既に退勤済みです']);
             }
+            //ステータスを退勤済みに更新
+            $attendance->status = '退勤済み';
+            // 退勤時刻を記録
             $attendance->clock_out = now();
             $attendance->save();
             DB::commit();
@@ -106,5 +106,19 @@ class AttendanceController extends Controller
         );
         // ビューにグループ化された勤怠データを渡す
         return view('attendances', compact('paginatedAttendances'));
+    }
+    public function showPasswordForm()
+    {
+        return view('password.form');
+    }
+    public function authenticateWithPassword(Request $request)
+    {
+        $password = env('PASSWORD');
+        if ($request->input('password') !== $password) {
+            return redirect()->route('password.form')->withErrors(['message' => 'passwordを正しく入力してください']);
+        }
+        // 認証が成功した場合の処理
+        Log::info('Authentication successful'); // ログ出力
+        return redirect()->route('attendances'); // 適切なリダイレクト先に変更する
     }
 }

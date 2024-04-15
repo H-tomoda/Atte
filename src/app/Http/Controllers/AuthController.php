@@ -10,4 +10,8 @@ class AuthController extends Controller
     {
         return view('index');
     }
+    public function showPasswordForm()
+    {
+        return view('password.form');
+    }
 }
