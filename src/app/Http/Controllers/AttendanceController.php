@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Attendance;
+use App\Models\BreakAttendance;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
@@ -63,6 +64,10 @@ class AttendanceController extends Controller
             $attendance->status = '退勤済み';
             // 退勤時刻を記録
             $attendance->clock_out = now();
+            //休憩時間を計算してhh:mm形式で保存
+            $breakTime = $this->calculateBreakTime($user->id, $attendance->clock_in, $attendance->clock_out);
+            $attendance->break_time = $breakTime;
+
             $attendance->save();
             DB::commit();
             return redirect()->back();
@@ -71,18 +76,45 @@ class AttendanceController extends Controller
             return back()->withErrors(['message' => $e->getMessage()]);
         }
     }
+    public function calculateBreakTime($userId, $startTime, $endTime)
+    {
+        $breakStart = BreakAttendance::where('user_id', $userId)
+            ->where('start_time', '>=', $startTime)
+            ->where('start_time', '<=', $endTime)
+            ->min('start_time');
+        $breakEnd = BreakAttendance::where('user_id', $userId)
+            ->where('end_time', '>=', $startTime)
+            ->where('end_time', '<=', $endTime)
+            ->max('end_time');
+        if ($breakStart && $breakEnd) {
+            return Carbon::parse($breakEnd)->diffInMinutes(Carbon::parse($breakStart)) / 60;
+        } else {
+            return 0;
+        }
+    }
     public function atte()
     {
         $user = Auth::user();
         $attendances = $user->attendances()->orderBy('clock_in', 'desc')->get();
 
-        $attendances->transform(function ($attendance) {
+        $attendances->transform(function ($attendance) use ($user) {
             $attendance->clock_in = Carbon::parse($attendance->clock_in);
+            //$attendance->clock_outの値をCarbonインスタンスに変換して、$attendance->clock_outに再代入する
+            $attendance->clock_out = $attendance->clock_out ? Carbon::parse($attendance->clock_out) : null;
+            //休憩時間を計算して追加する
+            $breakTime = $this->calculateBreakTime($user->id, $attendance->clock_in, $attendance->clock_out);
+            $attendance->break_time = $breakTime;
             return $attendance;
         });
         // 日付ごとにグループ化
         $groupedAttendances = $attendances->groupBy(function ($attendance) {
             return $attendance->clock_in->toDatestring();
+        });
+        //各日付ごとの休憩時間を計算して追加
+        $groupedAttendances->each(function ($attendances, $date) {
+            $totalBreakTime = $attendances->sum('break_time');
+            //日付ごとのそう休憩時間を$groupedAttendancesに追加
+            $groupedAttendances[$date]['total_break_time'] = $totalBreakTime;
         });
         // compact() 関数で変数をビューに渡す
         return view('atte', compact('groupedAttendances'));

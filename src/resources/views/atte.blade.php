@@ -28,7 +28,13 @@
             <td scope="col">{{ $attendance -> user->name}}</td>
             <td scope="col">{{ $attendance -> clock_in}}</td>
             <td scope="col">{{ $attendance -> clock_out ??'未退勤'}}</td>
-            <td scope="col">休憩時間</td>
+            <td scope="col">
+                @if(isset($attendance['total_break_time']))
+                {{$attendance['total_break_time']}}時間
+                @else
+                0 時間
+                @endif
+            </td>
             <td scope="col">勤務時間</td>
         </tr>
         @endforeach
