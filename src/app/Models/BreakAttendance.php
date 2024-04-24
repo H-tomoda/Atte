@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class BreakAttendance extends Model
 {
@@ -22,8 +23,8 @@ class BreakAttendance extends Model
     }
     public function calculateBreakTime($startTime, $endTime)
     {
-        $breakStart = Carbon::prase($startTime);
-        $breakEnd = Carbon::prase($endTime);
+        $breakStart = Carbon::parse($startTime);
+        $breakEnd = Carbon::parse($endTime);
         //休憩時間を分単位で計算
         $breakMinutes = $breakEnd->diffInMinutes($breakStart);
         //分単位の休憩時間をhh:mmに変換

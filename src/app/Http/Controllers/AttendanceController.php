@@ -7,7 +7,7 @@ use App\Models\Attendance;
 use App\Models\BreakAttendance;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
@@ -20,57 +20,59 @@ class AttendanceController extends Controller
     public function clockIn(Request $request)
     {
         $user = Auth::user();
+
+        // その日の出勤回数を取得
+        $todayAttendances = Attendance::where('user_id', $user->id)
+            ->whereDate('clock_in', Carbon::today())
+            ->count();
+
+        // 1日2回目の出勤にエラーで返す
+        if ($todayAttendances >= 1) {
+            return back()->withErrors(['message' => '1日複数回の出勤を制限しています。管理者にお問合せ下さい']);
+        }
+
+        // 出勤データを保存
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
-
-            //その日の出勤回数を取得
-            $todayAttendances = Attendance::where('user_id', $user->id)
-                ->whereDate('clock_in', Carbon::today())
-                ->count();
-            //1日2回目の出勤にエラーで返す
-            if ($todayAttendances >= 1) {
-                return back()->withErrors(['message' => '1日複数回の出勤を制限しています。管理者にお問合せ下さい']);
-            }
-
-
-            // 出勤データが存在しない場合に新しい出勤データを生成
             $attendance = new Attendance();
             $attendance->user_id = $user->id;
             $attendance->clock_in = now();
             $attendance->save();
             DB::commit();
-            return redirect()->back();
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['message' => $e->getMessage()]);
+            return redirect()->route('attendance.index')->withErrors(['message' => $e->getMessage()]);
         }
+
+        return view('index');
     }
     public function clockOut(Request $request)
     {
         $user = Auth::user();
         try {
             DB::beginTransaction();
-            //ユーザーの最新出勤レコードを確認
+            // ユーザーの最新出勤レコードを確認
             $attendance = Attendance::where('user_id', $user->id)->latest()->first();
-            //出勤していない場合、エラーを返す
+            // 出勤していない場合、エラーを返す
             if (!$attendance) {
                 return back()->withErrors(['message' => '出勤データがありません']);
             }
-            //既に退勤済みの場合、エラーを返す
+            // 既に退勤済みの場合、エラーを返す
             if ($attendance->clock_out) {
                 return back()->withErrors(['message' => '既に退勤済みです']);
             }
-            //ステータスを退勤済みに更新
+            // ステータスを退勤済みに更新
             $attendance->status = '退勤済み';
             // 退勤時刻を記録
             $attendance->clock_out = now();
-            //休憩時間を計算してhh:mm形式で保存
-            $breakTime = $this->calculateBreakTime($user->id, $attendance->clock_in, $attendance->clock_out);
+            // 休憩時間を計算してhh:mm形式で保存
+            var_dump('aaa');
+            $breakTime = $this->calculateBreakTime($user->id, $attendance->clock_in, $attendance->clock_out); // 修正
             $attendance->break_time = $breakTime;
 
             $attendance->save();
             DB::commit();
-            return redirect()->back();
+            return view('index');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors(['message' => $e->getMessage()]);
@@ -95,29 +97,50 @@ class AttendanceController extends Controller
     public function atte()
     {
         $user = Auth::user();
-        $attendances = $user->attendances()->orderBy('clock_in', 'desc')->get();
+        if (!$user) {
+            return redirect()->route('login')->withErrors(['message' => 'ログインしてください']);
+        }
 
-        $attendances->transform(function ($attendance) use ($user) {
-            $attendance->clock_in = Carbon::parse($attendance->clock_in);
-            //$attendance->clock_outの値をCarbonインスタンスに変換して、$attendance->clock_outに再代入する
-            $attendance->clock_out = $attendance->clock_out ? Carbon::parse($attendance->clock_out) : null;
-            //休憩時間を計算して追加する
-            $breakTime = $this->calculateBreakTime($user->id, $attendance->clock_in, $attendance->clock_out);
-            $attendance->break_time = $breakTime;
-            return $attendance;
-        });
-        // 日付ごとにグループ化
+        $attendances = $user->attendances()
+            ->orderBy('clock_in', 'desc')
+            ->get()
+            ->map(function ($attendance) use ($user) {
+                $attendance->clock_in = Carbon::parse($attendance->clock_in);
+                $attendance->clock_out = $attendance->clock_out ? Carbon::parse($attendance->clock_out) : null;
+                $attendance->break_time = 0; // 初期化
+                $attendance->work_time = $attendance->clock_out ? $attendance->clock_in->diffInMinutes($attendance->clock_out) / 60 : 0;
+                $attendance->user = $user;
+                return $attendance;
+            });
+
         $groupedAttendances = $attendances->groupBy(function ($attendance) {
-            return $attendance->clock_in->toDatestring();
+            return $attendance->clock_in->toDateString();
+        })->map(function ($attendances, $date) use ($user) {
+            $totalBreakTime = 0;
+            $totalWorkTime = 0;
+
+            foreach ($attendances as $attendance) {
+                $totalBreakTime += $this->calculateTotalBreakTime($attendance->breaks, $attendance->clock_in, $attendance->clock_out);
+                $totalWorkTime += $attendance->work_time;
+            }
+
+            return [
+                'attendances' => $attendances,
+                'total_break_time' => $totalBreakTime,
+                'total_work_time' => $totalWorkTime,
+                'user' => $user,
+            ];
         });
-        //各日付ごとの休憩時間を計算して追加
-        $groupedAttendances->each(function ($attendances, $date) {
-            $totalBreakTime = $attendances->sum('break_time');
-            //日付ごとのそう休憩時間を$groupedAttendancesに追加
-            $groupedAttendances[$date]['total_break_time'] = $totalBreakTime;
-        });
-        // compact() 関数で変数をビューに渡す
+
         return view('atte', compact('groupedAttendances'));
+    }
+    public function calculateTotalBreakTime($breaks, $clockIn, $clockOut)
+    {
+        $totalBreakTime = 0;
+        foreach ($breaks as $break) {
+            $totalBreakTime += $break->calculateBreakTime($clockIn, $clockOut);
+        }
+        return $totalBreakTime;
     }
     public function attendances()
     {

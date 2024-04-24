@@ -19,5 +19,5 @@ Route::get('/attendance', [AttendanceController::class, 'index']);
 Route::post('/attendance/clock-in', [AttendanceController::class, 'clockIn']);
 Route::post('/attendance/clock-out', [AttendanceController::class, 'clockOut']);
 Route::get('/atte', [AttendanceController::class, 'atte']);
-Route::post('/break/start', [BreakController::class, 'startBreak'])->name('break.start');
-Route::post('/break/end', [BreakController::class, 'endBreak'])->name('break.end');
+Route::post('/break/start', [BreakController::class, 'startBreak']);
+Route::post('/break/end', [BreakController::class, 'endBreak']);

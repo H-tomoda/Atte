@@ -1,3 +1,7 @@
+<?php
+
+use Carbon\Carbon; ?>
+html
 @extends('layouts.app')
 
 @section('css')
@@ -22,20 +26,37 @@
         <tr>
             <th colspan="6" class="date">{{ $date }}</th>
         </tr>
-        @foreach ($attendances as $attendance)
+        @foreach ($attendances['attendances'] as $attendance)
         <tr>
-            <td>{{$loop -> iteration}}</td>
-            <td scope="col">{{ $attendance -> user->name}}</td>
-            <td scope="col">{{ $attendance -> clock_in}}</td>
-            <td scope="col">{{ $attendance -> clock_out ??'未退勤'}}</td>
-            <td scope="col">
-                @if(isset($attendance['total_break_time']))
-                {{$attendance['total_break_time']}}時間
-                @else
-                0 時間
-                @endif
+            <td>{{ $loop->iteration }}</td>
+            <td>{{ $attendance->user->name }}</td>
+            <td>{{ Carbon::parse($attendance->clock_in)->format('m-d H:i:s') }}</td>
+            <td>{{ $attendance->clock_out ? Carbon::parse($attendance->clock_out)->format('m-d H:i:s') : '未退勤' }}</td>
+            <td>
+                @php
+                // 休憩時間を初期化
+                $totalBreakTime = 0;
+                // 当該日の出勤データに関連付けられた休憩時間を取得し、休憩時間を合計
+                foreach ($attendance->breaks as $break) {
+                $totalBreakTime += $break->calculateBreakTime($attendance->clock_in, $attendance->clock_out);
+                }
+                // 合計した休憩時間をhh:mm形式に変換して表示
+                echo sprintf('%02d:%02d', floor($totalBreakTime / 60), $totalBreakTime % 60);
+                @endphp
             </td>
-            <td scope="col">勤務時間</td>
+            <td>{{ $attendance->work_time ? sprintf('%02d:%02d', floor($attendance->work_time / 60), $attendance->work_time % 60) : '0:00' }}</td>
+            <td>
+                @php
+                dd($attendance->breaks);
+                // 休憩時間の計算ロジック
+                @endphp
+            </td>
+            <td>
+                @php
+                dd($attendance->breaks, $attendance->clock_in, $attendance->clock_out);
+                // 休憩時間の計算ロジック
+                @endphp
+            </td>
         </tr>
         @endforeach
         @endforeach

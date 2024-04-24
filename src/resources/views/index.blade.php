@@ -27,11 +27,11 @@
             @csrf
             <button type="submit" class="btn btn-secondary" id="clockOutButton">勤務終了</button>
         </form>
-        <form class="attendance__button" action="{{route('break.start')}}" method="post">
+        <form class="attendance__button" action="/break/start" method="post">
             @csrf
             <button type="submit" class="btn btn-success" id="startBreakButton">休憩開始</button>
         </form>
-        <form class="attendance__button" action="{{route('break.end')}}" method="post">
+        <form class="attendance__button" action="/break/end" method="post">
             @csrf
             <button type="submit" class="btn btn-danger" id="endBreakButton">休憩終了</button>
         </form>
