@@ -15,13 +15,11 @@ class CreateBreaksTable extends Migration
     {
         Schema::create('breaks', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('attendance_id'); // attendanceテーブルとの外部キー
+            $table->foreign('attendance_id')->references('id')->on('attendances')->onDelete('cascade');
             $table->timestamp('start_time');
             $table->timestamp('end_time')->nullable();
             $table->timestamps();
-            $table->unsignedBigInteger('attendance_id')->nullable(); // attendanceテーブルとの外部キー
-            $table->foreign('attendance_id')->references('id')->on('attendances')->onDelete('cascade');
         });
     }
 

@@ -78,19 +78,28 @@ class AttendanceController extends Controller
     }
     public function calculateBreakTime($userId, $startTime, $endTime)
     {
-        $breakStart = BreakAttendance::where('user_id', $userId)
-            ->where('start_time', '>=', $startTime)
-            ->where('start_time', '<=', $endTime)
-            ->min('start_time');
-        $breakEnd = BreakAttendance::where('user_id', $userId)
-            ->where('end_time', '>=', $startTime)
-            ->where('end_time', '<=', $endTime)
-            ->max('end_time');
-        if ($breakStart && $breakEnd) {
-            return Carbon::parse($breakEnd)->diffInMinutes(Carbon::parse($breakStart)) / 60;
-        } else {
-            return 0;
+        $attendance = Attendance::where('user_id', $userId)
+            ->where('clock_in', '>=', $startTime)
+            ->where('clock_in', '<=', $endTime)
+            ->first();
+
+        if ($attendance) {
+            $breakStart = BreakAttendance::where('attendance_id', $attendance->id)
+                ->where('start_time', '>=', $startTime)
+                ->where('start_time', '<=', $endTime)
+                ->min('start_time');
+
+            $breakEnd = BreakAttendance::where('attendance_id', $attendance->id)
+                ->where('end_time', '>=', $startTime)
+                ->where('end_time', '<=', $endTime)
+                ->max('end_time');
+
+            if ($breakStart && $breakEnd) {
+                return Carbon::parse($breakEnd)->diffInMinutes(Carbon::parse($breakStart)) / 60;
+            }
         }
+
+        return 0;
     }
     public function atte()
     {
@@ -137,7 +146,7 @@ class AttendanceController extends Controller
             ['path' => \illuminate\Pagination\Paginator::resolveCurrentPage()]
         );
         // ビューにグループ化された勤怠データを渡す
-        return view('attendances', compact('paginatedAttendances'));
+        return view('attendances', compact('attendances'));
     }
     public function showPasswordForm()
     {
