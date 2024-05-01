@@ -24,22 +24,22 @@
         </tr>
         @foreach ($attendances as $attendance)
         <tr>
-            <td>{{$loop -> iteration}}</td>
-            <td scope="col">{{ $attendance -> user->name}}</td>
-            <td scope="col">{{ $attendance -> clock_in}}</td>
-            <td scope="col">{{ $attendance -> clock_out ??'未退勤'}}</td>
-            <td scope="col">
-                @if(isset($attendance['total_break_time']))
-                {{$attendance['break_time']}}時間
+            <td>{{ $loop->iteration }}</td>
+            <td>{{ $attendance->user->name }}</td>
+            <td>{{ $attendance->clock_in->format('H:i') }}</td>
+            <td>{{ $attendance->clock_out ? $attendance->clock_out->format('H:i') : '未退勤' }}</td>
+            <td>
+                @if(isset($attendance->break_time))
+                {{ floor($attendance->break_time / 60) }}時間{{ $attendance->break_time % 60 }}分
                 @else
-                0 時間
+                0時間0分
                 @endif
             </td>
-            <td scope="col">
-                @if(isset($attendance['total_work_time']))
-                {{$attendance['total_work_time']}}時間
+            <td>
+                @if(isset($attendance->total_work_time))
+                {{ round($attendance->total_work_time, 2) }}時間
                 @else
-                0 時間
+                0時間
                 @endif
             </td>
         </tr>
