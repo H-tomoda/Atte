@@ -8,6 +8,7 @@ use App\Models\BreakAttendance;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class AttendanceController extends Controller
 {
@@ -50,25 +51,46 @@ class AttendanceController extends Controller
         $user = Auth::user();
         try {
             DB::beginTransaction();
-            //ユーザーの最新出勤レコードを確認
+            // ユーザーの最新出勤レコードを確認
             $attendance = Attendance::where('user_id', $user->id)->latest()->first();
-            //出勤していない場合、エラーを返す
+            // 出勤していない場合、エラーを返す
             if (!$attendance) {
                 return back()->withErrors(['message' => '出勤データがありません']);
             }
-            //既に退勤済みの場合、エラーを返す
+            // 既に退勤済みの場合、エラーを返す
             if ($attendance->clock_out) {
                 return back()->withErrors(['message' => '既に退勤済みです']);
             }
-            //ステータスを退勤済みに更新
+            // ステータスを退勤済みに更新
             $attendance->status = '退勤済み';
             // 退勤時刻を記録
             $attendance->clock_out = now();
-            //休憩時間を計算してhh:mm形式で保存
+            // 休憩時間を計算してhh:mm形式で保存
             $breakTime = $this->calculateBreakTime($user->id, $attendance->clock_in, $attendance->clock_out);
             $attendance->break_time = $breakTime;
 
+            // 労働時間の計算
+            $startTime = Carbon::parse($attendance->clock_in);
+            $endTime = Carbon::parse($attendance->clock_out);
+            $workDuration = $endTime->diffInMinutes($startTime) / 60; // 労働時間（時間単位）
+            $workDuration -= $attendance->break_time; // 休憩時間を差し引く
+
+            // total_work_time に労働時間をセット
+            $attendance->total_work_time = $workDuration;
+
+            // データベースに保存する前にログを出力
+            \Log::info('Clock out method - Before saving to database', [
+                'user_id' => $user->id,
+                'attendance_id' => $attendance->id,
+                'break_time' => $breakTime,
+                'total_work_time' => $workDuration // ログに労働時間も含める
+            ]);
+
+            // 保存処理
             $attendance->save();
+
+            // ログに出力
+            \Log::info('Saved Attendance:', $attendance->toArray());
             DB::commit();
             return redirect()->back();
         } catch (\Exception $e) {
@@ -78,27 +100,44 @@ class AttendanceController extends Controller
     }
     public function calculateBreakTime($userId, $startTime, $endTime)
     {
+        // メソッドが呼び出されたことをログに記録
+        Log::info('Start calculateBreakTime method');
+
+        // ユーザーの勤務記録を検索し、ログに記録
         $attendance = Attendance::where('user_id', $userId)
             ->where('clock_in', '>=', $startTime)
             ->where('clock_in', '<=', $endTime)
             ->first();
 
+        Log::info('Attendance record found: ' . json_encode($attendance));
+
         if ($attendance) {
+            // 休憩の開始時間を検索し、ログに記録
             $breakStart = BreakAttendance::where('attendance_id', $attendance->id)
                 ->where('start_time', '>=', $startTime)
                 ->where('start_time', '<=', $endTime)
                 ->min('start_time');
 
+            Log::info('Break start time: ' . $breakStart);
+
+            // 休憩の終了時間を検索し、ログに記録
             $breakEnd = BreakAttendance::where('attendance_id', $attendance->id)
                 ->where('end_time', '>=', $startTime)
                 ->where('end_time', '<=', $endTime)
                 ->max('end_time');
 
+            Log::info('Break end time: ' . $breakEnd);
+
             if ($breakStart && $breakEnd) {
-                return Carbon::parse($breakEnd)->diffInMinutes(Carbon::parse($breakStart)) / 60;
+                // 休憩時間の計算とログへの記録
+                $breakDuration = Carbon::parse($breakEnd)->diffInMinutes(Carbon::parse($breakStart)) / 60;
+                Log::info('Break duration: ' . $breakDuration);
+                return $breakDuration;
             }
         }
 
+        // 休憩時間が計算できなかった場合にログに記録
+        Log::info('No break time calculated');
         return 0;
     }
     public function atte()
