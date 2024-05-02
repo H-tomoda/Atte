@@ -20,7 +20,7 @@ class CreateAttendancesTable extends Migration
             $table->dateTime('clock_in');
             $table->dateTime('clock_out')->nullable(); // NULLを許可する
             $table->integer('daily_attendance_count')->default(0); // 出勤回数カウント
-            $table->time('break_time')->nullable(); // 1日総休憩時間
+            $table->integer('break_time')->nullable(); // 1日総休憩時間を整数型に変更し、NULLを許可する
             $table->time('total_work_time')->nullable(); // 1日総労働時間
             $table->timestamps();
         });

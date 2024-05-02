@@ -130,15 +130,21 @@ class AttendanceController extends Controller
 
             if ($breakStart && $breakEnd) {
                 // 休憩時間の計算とログへの記録
-                $breakDuration = Carbon::parse($breakEnd)->diffInMinutes(Carbon::parse($breakStart)) / 60;
-                Log::info('Break duration: ' . $breakDuration);
-                return $breakDuration;
+                $breakDuration = Carbon::parse($breakEnd)->diffInMinutes(Carbon::parse($breakStart));
+                Log::info('Break duration (minutes): ' . $breakDuration);
+
+                // 休憩時間を分単位でデータベースに格納する
+                $breakDurationInMinutes = (int) $breakDuration;
+                $attendance->break_time = $breakDurationInMinutes;
+                $attendance->save(); // データベースに保存
+
+                return $breakDurationInMinutes; // 分単位の休憩時間を返す
             }
         }
 
         // 休憩時間が計算できなかった場合にログに記録
         Log::info('No break time calculated');
-        return 0;
+        return 0; // デフォルト値として 0 分を返す
     }
     public function atte()
     {

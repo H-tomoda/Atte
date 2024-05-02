@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Attendance extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'user_id',
         'status',
@@ -18,6 +19,10 @@ class Attendance extends Model
         'total_work_time',
     ];
 
+    protected $casts = [
+        'break_time' => 'integer', // break_time を整数型にキャスト
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -26,5 +31,12 @@ class Attendance extends Model
     public function breaks()
     {
         return $this->hasMany(BreakAttendance::class);
+    }
+    public function updateBreakTime($attendanceId, $breakTime)
+    {
+        // Eloquent を使用してデータベースのレコードを更新
+        $attendance = Attendance::findOrFail($attendanceId);
+        $attendance->break_time = (int)$breakTime; // 整数値にキャストして代入
+        $attendance->save();
     }
 }
