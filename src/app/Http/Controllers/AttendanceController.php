@@ -72,10 +72,12 @@ class AttendanceController extends Controller
             // 労働時間の計算
             $startTime = Carbon::parse($attendance->clock_in);
             $endTime = Carbon::parse($attendance->clock_out);
-            $workDuration = $endTime->diffInMinutes($startTime) / 60; // 労働時間（時間単位）
-            $workDuration -= $attendance->break_time; // 休憩時間を差し引く
+            $workDuration = $endTime->diffInMinutes($startTime); // 労働時間（分単位）
 
-            // total_work_time に労働時間をセット
+            // 休憩時間を差し引く
+            $workDuration -= $attendance->break_time;
+
+            // total_work_time に分単位の労働時間をセット
             $attendance->total_work_time = $workDuration;
 
             // データベースに保存する前にログを出力

@@ -37,9 +37,16 @@
             </td>
             <td>
                 @if(isset($attendance->total_work_time))
-                {{ round($attendance->total_work_time, 2) }}時間
+                <?php
+                $timeString = $attendance->total_work_time;
+                list($hours, $minutes, $seconds) = explode(':', $timeString);
+                $totalSeconds = $hours * 3600 + $minutes * 60 + $seconds;
+                $hours = floor($totalSeconds / 3600);
+                $minutes = floor(($totalSeconds % 3600) / 60);
+                ?>
+                {{ str_pad($hours, 2, '0', STR_PAD_LEFT) }}時間{{ str_pad($minutes, 2, '0', STR_PAD_LEFT) }}分
                 @else
-                0時間
+                0時間0分
                 @endif
             </td>
         </tr>
