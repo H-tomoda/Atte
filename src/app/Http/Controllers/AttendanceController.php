@@ -184,6 +184,17 @@ class AttendanceController extends Controller
             // toDatestring() を呼び出す
             return $carbonDate->toDateString();
         });
+
+        // $attendances を変換してCarbonインスタンスに変更する
+        $attendances->transform(function ($attendances) {
+            $attendances->transform(function ($attendance) {
+                $attendance->clock_in = Carbon::parse($attendance->clock_in);
+                $attendance->clock_out = $attendance->clock_out ? Carbon::parse($attendance->clock_out) : null;
+                return $attendance;
+            });
+            return $attendances;
+        });
+
         // 各日付ごとのグループをページネーションする
         $paginatedAttendances = new \Illuminate\Pagination\LengthAwarePaginator(
             $attendances->forPage(\Illuminate\Pagination\Paginator::resolveCurrentPage(), 10),
@@ -193,20 +204,6 @@ class AttendanceController extends Controller
             ['path' => \illuminate\Pagination\Paginator::resolveCurrentPage()]
         );
         // ビューにグループ化された勤怠データを渡す
-        return view('attendances', compact('attendances'));
-    }
-    public function showPasswordForm()
-    {
-        return view('password.form');
-    }
-    public function authenticateWithPassword(Request $request)
-    {
-        $password = env('PASSWORD');
-        if ($request->input('password') !== $password) {
-            return redirect()->route('password.form')->withErrors(['message' => 'passwordを正しく入力してください']);
-        }
-        // 認証が成功した場合の処理
-        Log::info('Authentication successful'); // ログ出力
-        return redirect()->route('attendances'); // 適切なリダイレクト先に変更する
+        return view('attendances', compact('paginatedAttendances'));
     }
 }
