@@ -21,7 +21,7 @@
     <div class="attendance__panel">
         <form class="attendance__button" action="/attendance/clock-in" method="post">
             @csrf
-            <button type="submit" class="btn btn-primary">勤務開始</button>
+            <button type="submit" class="btn btn-primary"> 勤務開始</button>
         </form>
         <form class="attendance__button" action="/attendance/clock-out" method="post">
             @csrf

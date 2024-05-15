@@ -14,7 +14,7 @@ class BreakController extends Controller
         //ユーザー特定
         $user = Auth::user();
         //該当が休憩中ではない事を確認
-        if (Attendance::where('user_id', $user->id)->where('status', '休憩中')->exists()) {
+        if (Attendance::where('user_id', $user->id)->where('status', '1')->exists()) {
             return back()->withErrors(['message' => '既に休憩／外出中です']);
         }
         //出勤中の最新のレコードを取得
@@ -34,7 +34,7 @@ class BreakController extends Controller
         $break->save();
 
         //出勤中のステータスを休憩中に更新
-        $attendance->status = '休憩中';
+        $attendance->status = '1';
         $attendance->save();
 
         return redirect()->back()->with('success', '休憩／外出を開始しました');
@@ -45,7 +45,7 @@ class BreakController extends Controller
         //ユーザー特定
         $user = Auth::user();
         //休憩外出中であることを確認
-        if (!Attendance::where('user_id', $user->id)->where('status', '休憩中')->exists()) {
+        if (!Attendance::where('user_id', $user->id)->where('status', '1')->exists()) {
             return back()->withErrors(['message' => '休憩／外出中ではありません']);
         }
         //最後の休憩レコードを取得して終了時刻を記録
@@ -62,7 +62,7 @@ class BreakController extends Controller
         $break->save();
 
         //休憩終了時に出勤ステータスに変更
-        $attendance->status = '出勤中';
+        $attendance->status = '0';
         $attendance->save();
 
         return redirect()->back()->with('success', '休憩／外出を終了しました');

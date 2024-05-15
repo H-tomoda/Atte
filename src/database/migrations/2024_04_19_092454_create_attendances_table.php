@@ -16,7 +16,7 @@ class CreateAttendancesTable extends Migration
         Schema::create('attendances', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('status')->default('出勤中'); // 出勤中がデフォルト
+            $table->string('status')->default('0'); // 出勤中がデフォルト
             $table->dateTime('clock_in');
             $table->dateTime('clock_out')->nullable(); // NULLを許可する
             $table->integer('daily_attendance_count')->default(0); // 出勤回数カウント

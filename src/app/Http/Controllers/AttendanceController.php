@@ -62,7 +62,7 @@ class AttendanceController extends Controller
                 return back()->withErrors(['message' => '既に退勤済みです']);
             }
             // ステータスを退勤済みに更新
-            $attendance->status = '退勤済み';
+            $attendance->status = '2';
             // 退勤時刻を記録
             $attendance->clock_out = now();
             // 休憩時間を計算してhh:mm形式で保存
