@@ -19,6 +19,9 @@ class Attendance extends Model
         'total_work_time',
     ];
 
+    // $dates プロパティを追加して、clock_in と clock_out を Carbon オブジェクトとして扱う
+    protected $dates = ['clock_in', 'clock_out'];
+
     protected $casts = [
         'break_time' => 'integer', // break_time を整数型にキャスト
     ];

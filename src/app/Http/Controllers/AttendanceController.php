@@ -180,20 +180,22 @@ class AttendanceController extends Controller
         $attendances = Attendance::with('user')
             ->orderBy('clock_in', 'desc')
             ->get()
-            ->map(function ($attendance) {
-                $attendance->clock_in = Carbon::parse($attendance->clock_in);
-                $attendance->clock_out = $attendance->clock_out ? Carbon::parse($attendance->clock_out) : null;
-                return $attendance;
-            })
             ->groupBy(function ($attendance) {
-                return Carbon::parse($attendance->clock_in)->format('Y-m-d'); // 日付でグループ化
+                return Carbon::parse($attendance->clock_in)->format('Y-m-d');
             });
 
-        // ここでページネーションのためのロジックを追加
-        // 例として、最初のグループのみを取得して表示
-        $dateKey = $attendances->keys()->first();
-        $firstDayAttendances = $attendances[$dateKey];
+        $currentPage = request('page', 1);
+        $perPage = 1;
+        $currentItems = $attendances->slice(($currentPage - 1) * $perPage, $perPage)->all();
 
-        return view('attendances', compact('firstDayAttendances', 'dateKey'));
+        $paginatedAttendances = new \Illuminate\Pagination\LengthAwarePaginator(
+            $currentItems,
+            $attendances->count(),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
+        return view('attendances', compact('paginatedAttendances'));
     }
 }

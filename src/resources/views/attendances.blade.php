@@ -1,8 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+@foreach ($paginatedAttendances as $date => $dateAttendances)
 <div class="day-attendance">
-    <h3>日付: {{ $dateKey }}</h3>
+    <h3>日付: {{ $date }}</h3>
     <table class="table">
         <thead>
             <tr>
@@ -15,7 +16,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($firstDayAttendances as $index => $attendance)
+            @foreach ($dateAttendances as $index => $attendance)
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $attendance->user->name }}</td>
@@ -38,4 +39,6 @@
         </tbody>
     </table>
 </div>
+@endforeach
+{{ $paginatedAttendances->links() }}
 @endsection
