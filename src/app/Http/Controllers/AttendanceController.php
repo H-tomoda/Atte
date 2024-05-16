@@ -177,33 +177,23 @@ class AttendanceController extends Controller
     }
     public function attendances()
     {
-        // すべての勤怠データを取得し、日付ごとにグループ化する
-        $attendances = Attendance::orderBy('clock_in', 'desc')->get()->groupBy(function ($attendance) {
-            // Carbonインスタンスに変換
-            $carbonDate = Carbon::parse($attendance->clock_in);
-            // toDatestring() を呼び出す
-            return $carbonDate->toDateString();
-        });
-
-        // $attendances を変換してCarbonインスタンスに変更する
-        $attendances->transform(function ($attendances) {
-            $attendances->transform(function ($attendance) {
+        $attendances = Attendance::with('user')
+            ->orderBy('clock_in', 'desc')
+            ->get()
+            ->map(function ($attendance) {
                 $attendance->clock_in = Carbon::parse($attendance->clock_in);
                 $attendance->clock_out = $attendance->clock_out ? Carbon::parse($attendance->clock_out) : null;
                 return $attendance;
+            })
+            ->groupBy(function ($attendance) {
+                return Carbon::parse($attendance->clock_in)->format('Y-m-d'); // 日付でグループ化
             });
-            return $attendances;
-        });
 
-        // 各日付ごとのグループをページネーションする
-        $paginatedAttendances = new \Illuminate\Pagination\LengthAwarePaginator(
-            $attendances->forPage(\Illuminate\Pagination\Paginator::resolveCurrentPage(), 10),
-            $attendances->count(),
-            10,
-            null,
-            ['path' => \illuminate\Pagination\Paginator::resolveCurrentPage()]
-        );
-        // ビューにグループ化された勤怠データを渡す
-        return view('attendances', compact('paginatedAttendances'));
+        // ここでページネーションのためのロジックを追加
+        // 例として、最初のグループのみを取得して表示
+        $dateKey = $attendances->keys()->first();
+        $firstDayAttendances = $attendances[$dateKey];
+
+        return view('attendances', compact('firstDayAttendances', 'dateKey'));
     }
 }
