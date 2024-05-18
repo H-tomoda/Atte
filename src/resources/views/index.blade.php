@@ -21,11 +21,11 @@
     <!-- 現在のステータス表示 -->
     <div class="current-status">
         <h4>現在のステータス:
-            @if($status === 0)
+            @if($status == 0)
             出勤中
-            @elseif($status === 1)
+            @elseif($status == 1)
             休憩中
-            @elseif($status === 2)
+            @elseif($status == 2)
             退勤済み
             @else
             ステータス不明

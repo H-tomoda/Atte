@@ -22,7 +22,7 @@
         <tr>
             <th colspan="6" class="date">{{ $date }}</th>
         </tr>
-        @foreach ($attendances as $attendance) //勤務終了 何もないので回せずエラーになる
+        @foreach ($attendances as $attendance)
         <tr>
             <td>{{ $loop->iteration }}</td>
             <td>{{ $attendance->user->name }}</td>

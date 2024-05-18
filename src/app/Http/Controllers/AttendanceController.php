@@ -16,9 +16,12 @@ class AttendanceController extends Controller
     {
         $user = Auth::user();
         $latestAttendance = $user->attendances()->latest()->first();
-        $status = $latestAttendance ? $latestAttendance->status : null; // ステータスがない場合はnullを設定
+        $status = $latestAttendance ? $latestAttendance->status : null;
 
-        // 現在のステータスをビューに渡す
+        \Log::debug('User ID: ' . ($user ? $user->id : 'No user'));
+        \Log::debug('Latest Attendance: ' . ($latestAttendance ? json_encode($latestAttendance) : 'No attendance'));
+        \Log::debug('Current Status: ' . ($status !== null ? $status : 'No status'));
+
         return view('index', compact('status'));
     }
     public function clockIn(Request $request)
