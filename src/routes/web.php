@@ -8,7 +8,7 @@ use App\Models\Attendance;
 use PhpParser\Node\Stmt\Break_;
 
 Route::middleware('auth')->group(function () {
-    Route::get('/', [AuthController::class, 'index']);
+    Route::get('/', [AttendanceController::class, 'index'])->name('home');
     Route::middleware('password.auth')->group(function () {
         // Route::get('/attendances', [AttendanceController::class, 'index']);
         Route::get('/password/form', [AttendanceController::class, 'showPasswordForm'])->name('password.form');

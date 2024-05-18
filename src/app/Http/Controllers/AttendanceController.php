@@ -15,8 +15,11 @@ class AttendanceController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $attendances = $user->attendances()->orderBy('created_at', 'desc')->get();
-        return view('attendance.index', compact('attendances'));
+        $latestAttendance = $user->attendances()->latest()->first();
+        $status = $latestAttendance ? $latestAttendance->status : null; // ステータスがない場合はnullを設定
+
+        // 現在のステータスをビューに渡す
+        return view('index', compact('status'));
     }
     public function clockIn(Request $request)
     {

@@ -6,10 +6,10 @@
 
 @section('content')
 <div class="attendance__alert">
-    @if(count($errors)>0)
+    @if(count($errors) > 0)
     <ul>
-        @foreach ($errors ->all() as $error)
-        <li>{{$error}}</li>
+        @foreach ($errors->all() as $error)
+        <li>{{ $error }}</li>
         @endforeach
     </ul>
     @endif
@@ -18,22 +18,36 @@
 <div class="attendance__content">
     <div class="date" id="date"></div>
     <div class="clock" id="clock"></div>
+    <!-- 現在のステータス表示 -->
+    <div class="current-status">
+        <h4>現在のステータス:
+            @if($status === 0)
+            出勤中
+            @elseif($status === 1)
+            休憩中
+            @elseif($status === 2)
+            退勤済み
+            @else
+            ステータス不明
+            @endif
+        </h4>
+    </div>
     <div class="attendance__panel">
         <form class="attendance__button" action="/attendance/clock-in" method="post">
             @csrf
-            <button type="submit" class="btn btn-primary"> 勤務開始</button>
+            <button type="submit" class="btn btn-primary" {{ $status == 1 ? 'disabled' : '' }}>勤務開始</button>
         </form>
         <form class="attendance__button" action="/attendance/clock-out" method="post">
             @csrf
-            <button type="submit" class="btn btn-secondary" id="clockOutButton">勤務終了</button>
+            <button type="submit" class="btn btn-secondary" id="clockOutButton" {{ $status == 1 ? 'disabled' : '' }}>勤務終了</button>
         </form>
-        <form class="attendance__button" action="{{route('break.start')}}" method="post">
+        <form class="attendance__button" action="{{ route('break.start') }}" method="post">
             @csrf
-            <button type="submit" class="btn btn-success" id="startBreakButton">休憩開始</button>
+            <button type="submit" class="btn btn-success" id="startBreakButton" {{ $status == 1 ? 'disabled' : '' }}>休憩開始</button>
         </form>
-        <form class="attendance__button" action="{{route('break.end')}}" method="post">
+        <form class="attendance__button" action="{{ route('break.end') }}" method="post">
             @csrf
-            <button type="submit" class="btn btn-danger" id="endBreakButton">休憩終了</button>
+            <button type="submit" class="btn btn-danger" id="endBreakButton" {{ $status != 1 ? 'disabled' : '' }}>休憩終了</button>
         </form>
     </div>
 
@@ -42,31 +56,10 @@
             var now = new Date();
             var hours = now.getHours();
             var minutes = now.getMinutes();
-            var seconds = now.getSeconds();
-            var timeString = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
-            document.getElementById('clock').textContent = timeString;
-
-            var year = now.getFullYear();
-            var month = now.getMonth() + 1;
-            var day = now.getDate();
-            var dateString = year + '/' + month.toString().padStart(2, '0') + '/' + day.toString().padStart(2, '0');
-            document.getElementById('date').textContent = dateString;
+            document.getElementById('clock').textContent = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
+            document.getElementById('date').textContent = now.toISOString().split('T')[0]; // YYYY-MM-DD 形式
         }
-
-        // 初期表示
         updateClock();
-
-        // 1秒ごとに更新
         setInterval(updateClock, 1000);
-
-        //退勤ボタンがクリックされた時の処理
-        document.getElementById('clockOutButton').addEventListener('click', function() {
-            //ボタンの取得
-            var startBreakButton = document.getElementById('startBreakButton');
-            var endBreakButton = document.getElementById('endBreakButton');
-            //ボタンの無効化
-            startBreakButton.disabled = true;
-            endBreakButton.disabled = true;
-        });
     </script>
     @endsection
