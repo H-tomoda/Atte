@@ -175,27 +175,15 @@ class AttendanceController extends Controller
         // compact() 関数で変数をビューに渡す
         return view('atte', compact('groupedAttendances'));
     }
-    public function attendances()
+    public function attendances(Request $request)
     {
+        $date = $request->input('date', Carbon::today()->toDateString());
+
         $attendances = Attendance::with('user')
-            ->orderBy('clock_in', 'desc')
-            ->get()
-            ->groupBy(function ($attendance) {
-                return Carbon::parse($attendance->clock_in)->format('Y-m-d');
-            });
+            ->whereDate('clock_in', $date)
+            ->orderBy('clock_in', 'asc')
+            ->paginate(10); // ここでページネーションを設定
 
-        $currentPage = request('page', 1);
-        $perPage = 1;
-        $currentItems = $attendances->slice(($currentPage - 1) * $perPage, $perPage)->all();
-
-        $paginatedAttendances = new \Illuminate\Pagination\LengthAwarePaginator(
-            $currentItems,
-            $attendances->count(),
-            $perPage,
-            $currentPage,
-            ['path' => request()->url(), 'query' => request()->query()]
-        );
-
-        return view('attendances', compact('paginatedAttendances'));
+        return view('attendances', compact('attendances', 'date'));
     }
 }
