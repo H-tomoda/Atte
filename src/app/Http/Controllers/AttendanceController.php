@@ -159,26 +159,23 @@ class AttendanceController extends Controller
         $user = Auth::user();
         $attendances = $user->attendances()->orderBy('clock_in', 'desc')->get();
 
-        $attendances->transform(function ($attendance) use ($user) {
+        $attendances->transform(function ($attendance) {
+            // clock_inとclock_outをCarbonインスタンスで扱う
             $attendance->clock_in = Carbon::parse($attendance->clock_in);
-            //$attendance->clock_outの値をCarbonインスタンスに変換して、$attendance->clock_outに再代入する
             $attendance->clock_out = $attendance->clock_out ? Carbon::parse($attendance->clock_out) : null;
-            //休憩時間を計算して追加する
-            $breakTime = $this->calculateBreakTime($user->id, $attendance->clock_in, $attendance->clock_out);
-            $attendance->break_time = $breakTime;
+
+            // break_timeとtotal_work_timeがnullの場合は0を設定
+            $attendance->break_time = $attendance->break_time ?? 0;
+            $attendance->total_work_time = $attendance->total_work_time ?? 0;
+
             return $attendance;
         });
+
         // 日付ごとにグループ化
         $groupedAttendances = $attendances->groupBy(function ($attendance) {
-            return $attendance->clock_in->toDatestring();
+            return $attendance->clock_in->format('Y-m-d');
         });
-        //各日付ごとの休憩時間を計算して追加
-        $groupedAttendances->each(function ($attendances, $date) {
-            $totalBreakTime = $attendances->sum('break_time');
-            //日付ごとのそう休憩時間を$groupedAttendancesに追加
-            $groupedAttendances[$date]['total_break_time'] = $totalBreakTime;
-        });
-        // compact() 関数で変数をビューに渡す
+
         return view('atte', compact('groupedAttendances'));
     }
     public function attendances(Request $request)
