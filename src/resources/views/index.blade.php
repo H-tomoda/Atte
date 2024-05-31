@@ -51,6 +51,8 @@
         </form>
     </div>
 
+    <a href="{{ route('schedules.index') }}">あなたのスケジュールを見る</a>
+
     <script>
         function updateClock() {
             var now = new Date();
