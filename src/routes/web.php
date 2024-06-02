@@ -8,6 +8,8 @@ use App\Models\Attendance;
 use PhpParser\Node\Stmt\Break_;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\PdfFileController;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\DocumentTypeController;
 
 Route::middleware('auth')->group(function () {
     Route::get('/', [AttendanceController::class, 'index'])->name('home');
@@ -34,3 +36,10 @@ Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules
 Route::get('/upload', [PdfFileController::class, 'create'])->name('upload.form');
 Route::post('/upload', [PdfFileController::class, 'store'])->name('upload.store');
 Route::get('/files', [PdfFileController::class, 'index'])->name('files.index');
+
+
+Route::get('/clients/create', [ClientController::class, 'create'])->name('clients.create');
+Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
+
+Route::get('/document_types/create', [DocumentTypeController::class, 'create'])->name('document_types.create');
+Route::post('/document_types', [DocumentTypeController::class, 'store'])->name('document_types.store');
