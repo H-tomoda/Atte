@@ -45,4 +45,12 @@ class DocumentTypeController extends Controller
 
         return redirect()->route('document_types.create')->with('success', '証票種別が更新されました。');
     }
+
+    public function destroy($id)
+    {
+        $documentType = DocumentType::findOrFail($id);
+        $documentType->delete();
+
+        return redirect()->route('document_types.create')->with('success', '証票種別が削除されました。');
+    }
 }

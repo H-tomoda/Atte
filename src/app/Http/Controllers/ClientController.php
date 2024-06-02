@@ -45,4 +45,12 @@ class ClientController extends Controller
 
         return redirect()->route('clients.create')->with('success', '取引先が更新されました。');
     }
+
+    public function destroy($id)
+    {
+        $client = Client::findOrFail($id);
+        $client->delete();
+
+        return redirect()->route('clients.create')->with('success', '取引先が削除されました。');
+    }
 }
