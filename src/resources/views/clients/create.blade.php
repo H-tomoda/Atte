@@ -16,6 +16,13 @@
         <input type="text" name="name" id="name" required><br>
         <button type="submit">追加</button>
     </form>
+
+    <h2>取引先リスト</h2>
+    <ul>
+        @foreach ($clients as $client)
+        <li>ID: {{ $client->id }}, Name: {{ $client->name }} <a href="{{ route('clients.edit', $client->id) }}">編集</a></li>
+        @endforeach
+    </ul>
 </body>
 
 </html>

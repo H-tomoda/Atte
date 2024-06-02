@@ -40,6 +40,10 @@ Route::get('/files', [PdfFileController::class, 'index'])->name('files.index');
 
 Route::get('/clients/create', [ClientController::class, 'create'])->name('clients.create');
 Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
+Route::get('/clients/{id}/edit', [ClientController::class, 'edit'])->name('clients.edit');
+Route::post('/clients/{id}', [ClientController::class, 'update'])->name('clients.update');
 
 Route::get('/document_types/create', [DocumentTypeController::class, 'create'])->name('document_types.create');
 Route::post('/document_types', [DocumentTypeController::class, 'store'])->name('document_types.store');
+Route::get('/document_types/{id}/edit', [DocumentTypeController::class, 'edit'])->name('document_types.edit');
+Route::post('/document_types/{id}', [DocumentTypeController::class, 'update'])->name('document_types.update');
