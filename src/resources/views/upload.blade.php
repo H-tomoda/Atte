@@ -8,13 +8,14 @@
 <body>
     <form action="{{ route('upload.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
-        <label for="pdf">PDFファイルを選択:</label>
-        <input type="file" name="pdf" id="pdf" required><br>
+        <label for="file">ファイルを選択:</label>
+        <input type="file" name="file" id="file" required><br>
 
         <label for="document_type">証票種別:</label>
         <select name="document_type" id="document_type" required>
-            <option value="type1">Type 1</option>
-            <option value="type2">Type 2</option>
+            @foreach($documentTypes as $documentType)
+            <option value="{{ $documentType->name }}">{{ $documentType->name }}</option>
+            @endforeach
         </select><br>
 
         <label for="transaction_date">取引日付:</label>
@@ -22,8 +23,9 @@
 
         <label for="client">取引先:</label>
         <select name="client" id="client" required>
-            <option value="client1">Client 1</option>
-            <option value="client2">Client 2</option>
+            @foreach($clients as $client)
+            <option value="{{ $client->name }}">{{ $client->name }}</option>
+            @endforeach
         </select><br>
 
         <label for="transaction_amount">取引金額 (円):</label>

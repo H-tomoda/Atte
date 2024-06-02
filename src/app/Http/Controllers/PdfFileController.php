@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PdfFile;
+use App\Models\Client;
+use App\Models\DocumentType;
 use Illuminate\Support\Facades\Storage;
 
 class PdfFileController extends Controller
@@ -12,15 +14,17 @@ class PdfFileController extends Controller
     // アップロードフォームを表示するメソッド
     public function create()
     {
-        return view('upload'); // upload.blade.phpビューを表示
+        $clients = Client::all(); // すべてのクライアントを取得
+        $documentTypes = DocumentType::all(); // すべての証票種別を取得
+        return view('upload', compact('clients', 'documentTypes')); // クライアントデータと証票種別データをビューに渡す
     }
 
     // ファイルを保存するメソッド
     public function store(Request $request)
     {
-        // PDFファイルのバリデーション
+        // ファイルのバリデーション
         $request->validate([
-            'pdf' => 'required|mimes:pdf|max:2048',
+            'file' => 'required|mimes:pdf,jpeg,png,jpg,doc,docx,xls,xlsx|max:20480', // 20MBまでのファイルを許可
             'document_type' => 'required|string|max:255',
             'transaction_date' => 'required|date',
             'client' => 'required|string|max:255',
@@ -28,14 +32,15 @@ class PdfFileController extends Controller
             'remarks' => 'required|string|max:1000',
         ]);
 
-        // アップロードされたPDFファイルを取得
-        $pdf = $request->file('pdf');
-        $path = $pdf->store('pdf_files');
+        // アップロードされたファイルを取得
+        $file = $request->file('file');
+        $path = $file->store('uploaded_files');
 
         // PdfFileモデルを使ってデータベースにレコードを作成
         PdfFile::create([
-            'name' => $pdf->getClientOriginalName(),
+            'name' => $file->getClientOriginalName(),
             'path' => $path,
+            'file_type' => $file->getClientOriginalExtension(), // ファイルタイプを保存
             'document_type' => $request->document_type,
             'transaction_date' => $request->transaction_date,
             'client' => $request->client,
