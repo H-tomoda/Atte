@@ -41,6 +41,12 @@
 
         <button type="submit">更新</button>
     </form>
+
+    <form action="{{ route('files.destroy', $file->id) }}" method="POST" style="margin-top: 20px;">
+        @csrf
+        @method('DELETE')
+        <button type="submit" onclick="return confirm('本当に削除しますか？')">削除</button>
+    </form>
 </body>
 
 </html>

@@ -82,4 +82,17 @@ class PdfFileController extends Controller
 
         return redirect()->route('files.index')->with('success', 'ファイル情報が更新されました。');
     }
+
+    public function destroy($id)
+    {
+        $file = PdfFile::findOrFail($id);
+
+        // ファイルをストレージから削除
+        Storage::delete($file->path);
+
+        // データベースからレコードを削除
+        $file->delete();
+
+        return redirect()->route('files.index')->with('success', 'ファイルが削除されました。');
+    }
 }

@@ -38,6 +38,7 @@ Route::post('/upload', [PdfFileController::class, 'store'])->name('upload.store'
 Route::get('/files', [PdfFileController::class, 'index'])->name('files.index');
 Route::get('/files/{id}/edit', [PdfFileController::class, 'edit'])->name('files.edit');
 Route::put('/files/{id}', [PdfFileController::class, 'update'])->name('files.update');
+Route::delete('/files/{id}', [PdfFileController::class, 'destroy'])->name('files.destroy');
 
 Route::get('/clients/create', [ClientController::class, 'create'])->name('clients.create');
 Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
