@@ -28,33 +28,50 @@
 </head>
 
 <body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ route('clients.create') }}">取引先マスター登録</a></li>
+                <li><a href="{{ route('document_types.create') }}">証票種別マスター登録</a></li>
+                <li><a href="{{ route('files.index') }}">伝票一覧画面</a></li>
+            </ul>
+        </nav>
+    </header>
+
     <h1>アップロードされたファイルの一覧</h1>
 
-    <form action="{{ route('files.index') }}" method="GET">
-        <div>
-            <label for="transaction_date">日付:</label>
-            <input type="date" name="transaction_date" id="transaction_date" value="{{ request('transaction_date') }}">
+    <form action="{{ route('files.index') }}" method="GET" id="searchForm">
+        <div class="form-group">
+            <label for="transaction_date_start">開始日:</label>
+            <input type="date" name="transaction_date_start" id="transaction_date_start" value="{{ request('transaction_date_start') }}">
         </div>
-        <div>
+        <div class="form-group">
+            <label for="transaction_date_end">終了日:</label>
+            <input type="date" name="transaction_date_end" id="transaction_date_end" value="{{ request('transaction_date_end') }}">
+        </div>
+        <div class="form-group">
             <label for="client">取引先:</label>
             <input type="text" name="client" id="client" value="{{ request('client') }}">
         </div>
-        <div>
+        <div class="form-group">
             <label for="transaction_amount_min">取引金額 (円) 以上:</label>
             <input type="number" name="transaction_amount_min" id="transaction_amount_min" value="{{ request('transaction_amount_min') }}">
         </div>
-        <div>
+        <div class="form-group">
             <label for="transaction_amount_max">取引金額 (円) 以下:</label>
             <input type="number" name="transaction_amount_max" id="transaction_amount_max" value="{{ request('transaction_amount_max') }}">
         </div>
-        <div>
+        <div class="form-group">
             <label for="search_type">検索タイプ:</label>
             <select name="search_type" id="search_type">
                 <option value="AND" {{ request('search_type') == 'AND' ? 'selected' : '' }}>AND検索</option>
                 <option value="OR" {{ request('search_type') == 'OR' ? 'selected' : '' }}>OR検索</option>
             </select>
         </div>
-        <button type="submit">検索</button>
+        <div class="form-buttons">
+            <button type="submit">検索</button>
+            <button type="button" id="clearButton">クリア</button>
+        </div>
     </form>
 
     <table>
@@ -80,6 +97,18 @@
         </tbody>
     </table>
     <a href="{{ route('upload.form') }}">登録画面に戻る</a>
+
+    <script>
+        document.getElementById('clearButton').addEventListener('click', function() {
+            document.getElementById('transaction_date_start').value = '';
+            document.getElementById('transaction_date_end').value = '';
+            document.getElementById('client').value = '';
+            document.getElementById('transaction_amount_min').value = '';
+            document.getElementById('transaction_amount_max').value = '';
+            document.getElementById('search_type').selectedIndex = 0;
+            document.getElementById('searchForm').submit();
+        });
+    </script>
 </body>
 
 </html>
