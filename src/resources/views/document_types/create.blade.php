@@ -24,5 +24,6 @@
         @endforeach
     </ul>
 </body>
+<a href="{{ route('upload.form') }}">登録画面に戻る</a>
 
 </html>

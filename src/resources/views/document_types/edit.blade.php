@@ -22,6 +22,7 @@
         @method('DELETE')
         <button type="submit" onclick="return confirm('本当に削除しますか？')">削除</button>
     </form>
+    <a href="{{ route('upload.form') }}">登録画面に戻る</a>
 </body>
 
 </html>

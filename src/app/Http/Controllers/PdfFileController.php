@@ -45,9 +45,46 @@ class PdfFileController extends Controller
         return redirect()->route('files.index');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $files = PdfFile::all();
+        $query = PdfFile::query();
+
+        // 日付検索
+        if ($request->filled('transaction_date')) {
+            if ($request->search_type == 'OR') {
+                $query->orWhere('transaction_date', $request->transaction_date);
+            } else {
+                $query->where('transaction_date', $request->transaction_date);
+            }
+        }
+
+        // 取引先検索
+        if ($request->filled('client')) {
+            if ($request->search_type == 'OR') {
+                $query->orWhere('client', 'like', '%' . $request->client . '%');
+            } else {
+                $query->where('client', 'like', '%' . $request->client . '%');
+            }
+        }
+
+        // 取引金額検索
+        if ($request->filled('transaction_amount_min')) {
+            if ($request->search_type == 'OR') {
+                $query->orWhere('transaction_amount', '>=', $request->transaction_amount_min);
+            } else {
+                $query->where('transaction_amount', '>=', $request->transaction_amount_min);
+            }
+        }
+
+        if ($request->filled('transaction_amount_max')) {
+            if ($request->search_type == 'OR') {
+                $query->orWhere('transaction_amount', '<=', $request->transaction_amount_max);
+            } else {
+                $query->where('transaction_amount', '<=', $request->transaction_amount_max);
+            }
+        }
+
+        $files = $query->get();
         return view('files', compact('files'));
     }
 

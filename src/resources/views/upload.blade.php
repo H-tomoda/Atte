@@ -6,6 +6,18 @@
 </head>
 
 <body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ route('clients.create') }}">取引先マスター登録</a></li>
+                <li><a href="{{ route('document_types.create') }}">証票種別マスター登録</a></li>
+                <li><a href="{{ route('files.index') }}">伝票一覧画面</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <h1>ファイルアップロード</h1>
+
     <form action="{{ route('upload.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <label for="file">ファイルを選択:</label>
