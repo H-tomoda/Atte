@@ -36,7 +36,8 @@ Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules
 Route::get('/upload', [PdfFileController::class, 'create'])->name('upload.form');
 Route::post('/upload', [PdfFileController::class, 'store'])->name('upload.store');
 Route::get('/files', [PdfFileController::class, 'index'])->name('files.index');
-
+Route::get('/files/{id}/edit', [PdfFileController::class, 'edit'])->name('files.edit');
+Route::put('/files/{id}', [PdfFileController::class, 'update'])->name('files.update');
 
 Route::get('/clients/create', [ClientController::class, 'create'])->name('clients.create');
 Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
