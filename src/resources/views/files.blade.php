@@ -24,6 +24,19 @@
             background-color: #4CAF50;
             color: white;
         }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-buttons {
+            margin-top: 15px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 
@@ -77,8 +90,9 @@
     <table>
         <thead>
             <tr>
+                <th>プレビュー</th>
                 <th>ファイル名</th>
-                <th>日付</th>
+                <th>取引日付</th>
                 <th>取引先</th>
                 <th>取引金額</th>
                 <th>アクション</th>
@@ -87,15 +101,17 @@
         <tbody>
             @foreach ($files as $file)
             <tr>
-                <td>{{ $file->name }} - <a href="{{ asset('storage/' . str_replace('public/', '', $file->path)) }}">ダウンロード</a></td>
+                <td><a href="{{ asset('storage/' . str_replace('public/', '', $file->path)) }}" target="_blank">プレビュー確認</a></td>
+                <td>{{ $file->name }}</td>
                 <td>{{ $file->transaction_date }}</td>
                 <td>{{ $file->client }}</td>
                 <td>{{ number_format($file->transaction_amount) }}円</td>
-                <td><a href="{{ route('files.edit', $file->id) }}">編集</a></td>
+                <td class="actions"><a href="{{ route('files.edit', $file->id) }}">編集</a></td>
             </tr>
             @endforeach
         </tbody>
     </table>
+    {{ $files->links() }}
     <a href="{{ route('upload.form') }}">登録画面に戻る</a>
 
     <script>
