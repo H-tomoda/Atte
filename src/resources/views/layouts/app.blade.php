@@ -22,6 +22,9 @@
                     <ul class="header-nav">
                         @if (Auth::check())
                         <li class="header-nav__item">
+                            <a class="header-nav__link" href="/schedule/list">スケジュール一覧</a>
+                        </li>
+                        <li class="header-nav__item">
                             <a class="header-nav__link" href="/upload">document登録</a>
                         </li>
                         <li class="header-nav__item">

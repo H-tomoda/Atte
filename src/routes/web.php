@@ -27,8 +27,8 @@ Route::post('/break/start', [BreakController::class, 'startBreak'])->name('break
 Route::post('/break/end', [BreakController::class, 'endBreak'])->name('break.end');
 Route::get('/attendances', [AttendanceController::class, 'attendances'])->name('attendances');
 Route::get('/schedules', [ScheduleController::class, 'index'])->name('schedules.index');
+Route::get('/schedule/list', [ScheduleController::class, 'list'])->name('schedules.list');
 Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
-
 
 
 

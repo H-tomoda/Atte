@@ -16,7 +16,6 @@ class Schedule extends Model
         $this->attributes['start_time'] = Carbon::parse($value)->format('H:i:s');
     }
 
-    // end_timeのセッター
     public function setEndTimeAttribute($value)
     {
         $this->attributes['end_time'] = Carbon::parse($value)->format('H:i:s');

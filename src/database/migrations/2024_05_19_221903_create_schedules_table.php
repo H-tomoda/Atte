@@ -10,18 +10,17 @@ class CreateSchedulesTable extends Migration
     {
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');  // ユーザーID
-            $table->date('date');  // 日付
-            $table->time('start_time');  // 開始時間
-            $table->time('end_time');  // 終了時間
-            $table->string('title');  // 活動のタイトル
-            $table->string('activity');  // 活動内容
-            $table->string('location')->nullable();  // 場所（必要に応じてnull可）
-            $table->text('description')->nullable();  // 詳細説明（必要に応じてnull可）
+            $table->unsignedBigInteger('user_id');  // ユーザーIDがあるか確認
+            $table->date('date');
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->string('title');
+            $table->string('activity');
+            $table->string('location')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')
-                ->onDelete('cascade');  // ユーザーが削除された場合、関連するスケジュールも削除される
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

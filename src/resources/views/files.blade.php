@@ -46,7 +46,7 @@
             <ul>
                 <li><a href="{{ route('clients.create') }}">取引先マスター登録</a></li>
                 <li><a href="{{ route('document_types.create') }}">証票種別マスター登録</a></li>
-                <li><a href="{{ route('files.index') }}">伝票一覧画面</a></li>
+                <li><a href="{{ route('upload.form') }}">登録画面に戻る</a></li>
             </ul>
         </nav>
     </header>
@@ -126,5 +126,6 @@
         });
     </script>
 </body>
+
 
 </html>
