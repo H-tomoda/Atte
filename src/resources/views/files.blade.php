@@ -3,41 +3,7 @@
 
 <head>
     <title>アップロードされたファイル</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-buttons {
-            margin-top: 15px;
-        }
-
-        .actions {
-            display: flex;
-            justify-content: space-between;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/upload.css') }}">
 </head>
 
 <body>
@@ -74,6 +40,7 @@
         <div class="form-buttons">
             <button type="submit">検索</button>
             <button type="button" id="clearButton">クリア</button>
+            <button type="button" id="downloadAllButton">一括ダウンロード</button>
         </div>
     </form>
 
@@ -98,12 +65,15 @@
                 <td>{{ $file->client }}</td>
                 <td>{{ number_format($file->transaction_amount) }}円</td>
                 <td>{{ $file->remarks }}</td>
-                <td class="actions"><a href="{{ route('files.edit', $file->id) }}">編集</a></td>
+                <td class="actions">
+                    <a href="{{ route('files.edit', $file->id) }}">編集</a>
+                    <a href="{{ asset('storage/' . str_replace('public/', '', $file->path)) }}" class="download-button" download>ダウンロード</a>
+                </td>
             </tr>
             @endforeach
         </tbody>
     </table>
-    {{ $files->links() }}
+    {{ $files->links('vendor.pagination.bootstrap-4') }}
     <a href="{{ route('upload.form') }}">登録画面に戻る</a>
 
     <script>
@@ -115,6 +85,14 @@
             document.getElementById('transaction_amount_max').value = '';
             document.getElementById('search_type').selectedIndex = 0;
             document.getElementById('searchForm').submit();
+        });
+
+        document.getElementById('downloadAllButton').addEventListener('click', function() {
+            const form = document.getElementById('searchForm');
+            const action = form.action;
+            form.action = '{{ route("files.download-zip") }}';
+            form.submit();
+            form.action = action;
         });
     </script>
 </body>

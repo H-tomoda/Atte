@@ -46,7 +46,7 @@
 .header-buttons {
     display: flex;
     justify-content: flex-start;
-    /* 左揃えにする */
+    gap: 10px;
     margin-bottom: 20px;
 }
 
@@ -61,4 +61,169 @@
 
 .header-buttons button:hover {
     background-color: #45a049;
+}
+
+.container {
+    display: flex;
+}
+
+.sidebar {
+    width: 30%;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+}
+
+.main-content {
+    width: 70%;
+    padding: 20px;
+}
+/* Table styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Form styles */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-buttons {
+    margin-top: 15px;
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Pagination styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+}
+
+.pagination li {
+    margin: 0 5px;
+}
+
+.pagination li a,
+.pagination li span {
+    display: block;
+    padding: 8px 16px;
+    text-decoration: none;
+    color: #007bff;
+    font-size: 14px;
+}
+
+.pagination li a:hover,
+.pagination li span:hover {
+    background-color: #ddd;
+    border-radius: 5px;
+}
+
+.pagination .active span {
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+}
+
+/* Download button styles */
+.download-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    text-decoration: none;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.download-button:hover {
+    background-color: #45a049;
+}
+/* テーブルのスタイル */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-buttons {
+    margin-top: 15px;
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ページネーションのスタイル */
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+}
+
+.pagination li {
+    margin: 0 5px;
+}
+
+.pagination li a,
+.pagination li span {
+    display: block;
+    padding: 8px 16px;
+    text-decoration: none;
+    color: #007bff;
+    font-size: 14px;
+}
+
+.pagination li a:hover,
+.pagination li span:hover {
+    background-color: #ddd;
+    border-radius: 5px;
+}
+
+.pagination .active span {
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
 }

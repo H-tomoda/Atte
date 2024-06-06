@@ -11,6 +11,8 @@ use App\Http\Controllers\PdfFileController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DocumentTypeController;
 
+
+//ログイン用
 Route::middleware('auth')->group(function () {
     Route::get('/', [AttendanceController::class, 'index'])->name('home');
     Route::middleware('password.auth')->group(function () {
@@ -19,6 +21,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/authenticate/with/password', [AttendanceController::class, 'authenticateWithPassword'])->name('authenticate.with.password');
     });
 });
+
+//勤怠管理用
 Route::get('/attendance', [AttendanceController::class, 'index']);
 Route::post('/attendance/clock-in', [AttendanceController::class, 'clockIn']);
 Route::post('/attendance/clock-out', [AttendanceController::class, 'clockOut']);
@@ -26,6 +30,8 @@ Route::get('/atte', [AttendanceController::class, 'atte']);
 Route::post('/break/start', [BreakController::class, 'startBreak'])->name('break.start');
 Route::post('/break/end', [BreakController::class, 'endBreak'])->name('break.end');
 Route::get('/attendances', [AttendanceController::class, 'attendances'])->name('attendances');
+
+//スケジュール登録用
 Route::get('/schedules', [ScheduleController::class, 'index'])->name('schedules.index');
 Route::get('/schedule/list', [ScheduleController::class, 'list'])->name('schedules.list');
 Route::post('/schedules', [ScheduleController::class, 'store'])->name('schedules.store');
@@ -33,15 +39,14 @@ Route::get('/schedules/{schedule}/edit', [ScheduleController::class, 'edit'])->n
 Route::put('/schedules/{schedule}', [ScheduleController::class, 'update'])->name('schedules.update');
 Route::delete('/schedules/{schedule}', [ScheduleController::class, 'destroy'])->name('schedules.destroy');
 
-
-
-
+//文書管理用
 Route::get('/upload', [PdfFileController::class, 'create'])->name('upload.form');
 Route::post('/upload', [PdfFileController::class, 'store'])->name('upload.store');
 Route::get('/files', [PdfFileController::class, 'index'])->name('files.index');
 Route::get('/files/{id}/edit', [PdfFileController::class, 'edit'])->name('files.edit');
 Route::put('/files/{id}', [PdfFileController::class, 'update'])->name('files.update');
 Route::delete('/files/{id}', [PdfFileController::class, 'destroy'])->name('files.destroy');
+Route::get('/files/download-zip', [PdfFileController::class, 'downloadZip'])->name('files.download-zip');
 
 Route::get('/clients/create', [ClientController::class, 'create'])->name('clients.create');
 Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
