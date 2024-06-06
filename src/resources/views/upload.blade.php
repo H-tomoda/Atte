@@ -1,17 +1,17 @@
-<!DOCTYPE html>
-<html>
+@extends('layouts.app')
 
-<head>
-    <title>ファイルアップロード</title>
-    <link rel="stylesheet" href="{{ asset('css/upload.css') }}">
-</head>
+@section('css')
+<link rel="stylesheet" href="{{ asset('css/upload.css') }}">
+@endsection
+
+@section('content')
 
 <body>
     <header>
         <nav class="header-buttons">
             <button onclick="location.href='{{ route('clients.create') }}'">取引先マスター登録</button>
             <button onclick="location.href='{{ route('document_types.create') }}'">証票種別マスター登録</button>
-            <button onclick="location.href='{{ route('files.index') }}'">伝票一覧画面</button>
+            <button onclick="location.href='{{ route('files.index') }}'" class="blue-background">伝票一覧画面</button>
         </nav>
     </header>
 
@@ -159,4 +159,4 @@
     </script>
 </body>
 
-</html>
+@endsection

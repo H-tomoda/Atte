@@ -45,7 +45,7 @@
 
 .header-buttons {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 10px;
     margin-bottom: 20px;
 }
@@ -62,7 +62,14 @@
 .header-buttons button:hover {
     background-color: #45a049;
 }
+.header-buttons .blue-background {
+    background-color: #007bff;
+    color: white;
+}
 
+.header-buttons .blue-background:hover {
+    background-color: #0056b3;
+}
 .container {
     display: flex;
 }

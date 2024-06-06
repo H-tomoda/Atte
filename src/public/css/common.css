@@ -22,7 +22,7 @@
 }
 
 .header-utilities nav {
-    width: 48%;
+    width: 60%;
 }
 
 .header-nav {
@@ -43,4 +43,11 @@
     color: #fff;
     font-size: 16px;
     cursor: pointer;
+}
+.header-nav__link:hover,
+.header-nav__button:hover {
+    background-color: #808080;
+    /* ホバー時の背景色をグレーに設定 */
+    color: #fff;
+    /* テキスト色を白に保持 */
 }
