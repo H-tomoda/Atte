@@ -19,15 +19,26 @@ class ScheduleController extends Controller
 
         $userId = $request->input('user_id', Auth::id());
 
+        // ページネーションを最初に適用
         $schedules = Schedule::where('user_id', $userId)
             ->whereBetween('date', [$startOfWeek, $endOfWeek])
             ->orderBy('date', 'asc')
             ->orderBy('start_time', 'asc')
-            ->paginate(10);
+            ->paginate(9);
+
+        // ページネーションが適用された後の各スケジュールに対して重複チェック
+        $schedules->getCollection()->each(function ($schedule) use ($schedules) {
+            $schedule->is_conflict = $schedules->getCollection()->filter(function ($other) use ($schedule) {
+                return $other->id !== $schedule->id && $other->date === $schedule->date && (
+                    ($other->start_time <= $schedule->start_time && $other->end_time >= $schedule->start_time) ||
+                    ($other->start_time <= $schedule->end_time && $other->end_time >= $schedule->end_time) ||
+                    ($other->start_time >= $schedule->start_time && $other->end_time <= $schedule->end_time)
+                );
+            })->isNotEmpty();
+        });
 
         return view('schedules.index', compact('schedules', 'startOfWeek', 'endOfWeek', 'userId'));
     }
-
     public function store(Request $request)
     {
         try {
@@ -40,6 +51,26 @@ class ScheduleController extends Controller
                 'activity' => 'required',
                 'location' => 'nullable|string'
             ]);
+
+            // 重複チェック
+            $existingSchedule = Schedule::where('user_id', Auth::id())
+                ->where('date', $request->date)
+                ->where(function ($query) use ($request) {
+                    $query->whereBetween('start_time', [$request->start_time, $request->end_time])
+                        ->orWhereBetween('end_time', [$request->start_time, $request->end_time])
+                        ->orWhere(function ($query) use ($request) {
+                            $query->where('start_time', '<', $request->start_time)
+                                ->where('end_time', '>', $request->end_time);
+                        });
+                })
+                ->first();
+
+            if ($existingSchedule && !$request->input('confirm', false)) {
+                // フロントエンドに重複メッセージを返す
+                return back()->withErrors(['confirm' => '時間が重複していますが問題ないでしょうか'])
+                    ->withInput()
+                    ->with('confirm', true);
+            }
 
             $schedule = new Schedule($validated);
             $schedule->user_id = Auth::id();

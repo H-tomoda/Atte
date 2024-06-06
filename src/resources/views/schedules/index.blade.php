@@ -8,38 +8,39 @@
             <h2>スケジュールを追加</h2>
             <form method="post" action="{{ route('schedules.store') }}" id="scheduleForm">
                 @csrf
+                <input type="hidden" name="confirm" id="confirm" value="0">
                 <div class="form-group">
                     <label for="activity">活動</label>
                     <select name="activity" id="activity" class="form-control" required>
                         <option value="" disabled selected>活動を選択してください</option>
-                        <option value="社内活動">社内活動</option>
-                        <option value="社外活動">社外活動</option>
-                        <option value="その他">その他</option>
+                        <option value="社内活動" {{ old('activity') == '社内活動' ? 'selected' : '' }}>社内活動</option>
+                        <option value="社外活動" {{ old('activity') == '社外活動' ? 'selected' : '' }}>社外活動</option>
+                        <option value="その他" {{ old('activity') == 'その他' ? 'selected' : '' }}>その他</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="title">活動タイトル</label>
-                    <input type="text" name="title" id="title" class="form-control" placeholder="活動タイトル" required>
+                    <input type="text" name="title" id="title" class="form-control" placeholder="活動タイトル" value="{{ old('title') }}" required>
                 </div>
                 <div class="form-group">
                     <label for="date">日付</label>
-                    <input type="date" name="date" id="date" class="form-control" required>
+                    <input type="date" name="date" id="date" class="form-control" value="{{ old('date') }}" required>
                 </div>
                 <div class="form-group">
                     <label for="start_time">開始時間</label>
-                    <input type="time" name="start_time" id="start_time" class="form-control" required>
+                    <input type="time" name="start_time" id="start_time" class="form-control" value="{{ old('start_time') }}" required>
                 </div>
                 <div class="form-group">
                     <label for="end_time">終了時間</label>
-                    <input type="time" name="end_time" id="end_time" class="form-control" required>
+                    <input type="time" name="end_time" id="end_time" class="form-control" value="{{ old('end_time') }}" required>
                 </div>
                 <div class="form-group">
                     <label for="description">説明</label>
-                    <textarea name="description" id="description" class="form-control" placeholder="説明"></textarea>
+                    <textarea name="description" id="description" class="form-control" placeholder="説明">{{ old('description') }}</textarea>
                 </div>
                 <div class="form-group">
                     <label for="location">場所</label>
-                    <input type="text" name="location" id="location" class="form-control" placeholder="場所">
+                    <input type="text" name="location" id="location" class="form-control" placeholder="場所" value="{{ old('location') }}">
                 </div>
                 <button type="submit" class="btn btn-primary">活動を追加</button>
             </form>
@@ -53,6 +54,9 @@
                     <div class="card mb-4">
                         <div class="card-header">
                             {{ $schedule->title }}
+                            @if ($schedule->is_conflict)
+                            <span class="conflict-badge float-right"> ※重複予定</span>
+                            @endif
                         </div>
                         <div class="card-body">
                             <p><strong>活動: </strong>{{ $schedule->activity }}</p>
@@ -73,7 +77,7 @@
             </div>
             <!-- ページネーションのリンク -->
             <div class="d-flex justify-content-center">
-                {{ $schedules->links() }}
+                {{ $schedules->appends(request()->query())->links('vendor.pagination.bootstrap-4') }}
             </div>
         </div>
     </div>
@@ -88,4 +92,14 @@
     </ul>
 </div>
 @endif
+
+@if (session('confirm'))
+<script>
+    if (confirm("時間が重複していますが問題ないでしょうか？")) {
+        document.getElementById('confirm').value = 1;
+        document.getElementById('scheduleForm').submit();
+    }
+</script>
+@endif
+
 @endsection
