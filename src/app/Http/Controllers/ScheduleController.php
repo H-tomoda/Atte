@@ -25,9 +25,7 @@ class ScheduleController extends Controller
             ->orderBy('start_time', 'asc')
             ->paginate(10);
 
-        $users = User::all();
-
-        return view('schedules.index', compact('schedules', 'startOfWeek', 'endOfWeek', 'users', 'userId'));
+        return view('schedules.index', compact('schedules', 'startOfWeek', 'endOfWeek', 'userId'));
     }
 
     public function store(Request $request)
@@ -59,17 +57,74 @@ class ScheduleController extends Controller
         }
     }
 
+    public function edit(Schedule $schedule)
+    {
+        // 時間の形式を設定
+        $schedule->start_time = Carbon::parse($schedule->start_time)->format('H:i');
+        $schedule->end_time = Carbon::parse($schedule->end_time)->format('H:i');
+
+        return view('schedules.edit', compact('schedule'));
+    }
+
+    public function update(Request $request, Schedule $schedule)
+    {
+        try {
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'date' => 'required|date',
+                'start_time' => 'required|date_format:H:i',
+                'end_time' => 'required|date_format:H:i|after:start_time',
+                'activity' => 'required',
+                'location' => 'nullable|string'
+            ]);
+
+            $schedule->update($validated);
+
+            Log::info('Schedule updated successfully.', ['id' => $schedule->id]);
+
+            return redirect()->route('schedules.index')->with('success', 'スケジュールが正常に更新されました。');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation error: ' . $e->getMessage(), ['errors' => $e->errors()]);
+            return back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            Log::error('Error updating schedule: ' . $e->getMessage());
+            return back()->withErrors('スケジュール更新中にエラーが発生しました。')->withInput();
+        }
+    }
+
+    public function destroy(Schedule $schedule)
+    {
+        $schedule->delete();
+
+        Log::info('Schedule deleted successfully.', ['id' => $schedule->id]);
+
+        return back()->with('success', 'スケジュールが正常に削除されました。');
+    }
+
     public function list(Request $request)
     {
-        $userId = $request->input('user_id', Auth::id());
+        $userId = $request->input('user_id', null);
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
 
-        $schedules = Schedule::where('user_id', '!=', $userId)
-            ->orderBy('date', 'asc')
+        $query = Schedule::with('user'); // ユーザー情報をロード
+
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('date', [$startDate, $endDate]);
+        }
+
+        $schedules = $query->orderBy('date', 'asc')
             ->orderBy('start_time', 'asc')
-            ->paginate(10);
+            ->paginate(9);
 
         $users = User::all();
+        $loggedInUser = Auth::user();
 
-        return view('schedules.list', compact('schedules', 'users', 'userId'));
+        return view('schedules.list', compact('schedules', 'users', 'userId', 'startDate', 'endDate', 'loggedInUser'));
     }
 }

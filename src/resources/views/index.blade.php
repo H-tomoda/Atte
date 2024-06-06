@@ -50,18 +50,30 @@
             <button type="submit" class="btn btn-danger" id="endBreakButton" {{ $status != 1 ? 'disabled' : '' }}>休憩終了</button>
         </form>
     </div>
+    <div class="center-button">
+        <a class="btn btn-primary btn-lg" href="{{ route('schedules.index') }}">スケジュール登録・編集</a>
+    </div>
+</div>
 
-    <a href="{{ route('schedules.index') }}">スケジュール登録</a>
+@if ($errors->any())
+<div class="alert alert-danger">
+    <ul>
+        @foreach ($errors->all() as $error)
+        <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
+@endif
 
-    <script>
-        function updateClock() {
-            var now = new Date();
-            var hours = now.getHours();
-            var minutes = now.getMinutes();
-            document.getElementById('clock').textContent = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
-            document.getElementById('date').textContent = now.toISOString().split('T')[0]; // YYYY-MM-DD 形式
-        }
-        updateClock();
-        setInterval(updateClock, 1000);
-    </script>
-    @endsection
+<script>
+    function updateClock() {
+        var now = new Date();
+        var hours = now.getHours();
+        var minutes = now.getMinutes();
+        document.getElementById('clock').textContent = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
+        document.getElementById('date').textContent = now.toISOString().split('T')[0]; // YYYY-MM-DD 形式
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+</script>
+@endsection

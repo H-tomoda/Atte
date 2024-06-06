@@ -20,4 +20,8 @@ class Schedule extends Model
     {
         $this->attributes['end_time'] = Carbon::parse($value)->format('H:i:s');
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

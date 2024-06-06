@@ -60,6 +60,12 @@
                             <p><strong>時間: </strong>{{ $schedule->start_time }} - {{ $schedule->end_time }}</p>
                             <p><strong>場所: </strong>{{ $schedule->location }}</p>
                             <p><strong>説明: </strong>{{ $schedule->description }}</p>
+                            <a href="{{ route('schedules.edit', $schedule->id) }}" class="btn btn-warning">編集</a>
+                            <form action="{{ route('schedules.destroy', $schedule->id) }}" method="post" style="display:inline-block;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">削除</button>
+                            </form>
                         </div>
                     </div>
                 </div>

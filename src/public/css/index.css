@@ -88,3 +88,8 @@
     pointer-events: none;
     /*ボタンの無効化 */
 }
+.center-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
