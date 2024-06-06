@@ -15,7 +15,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('handle:midnight-transition')->dailyAt('00:00');
+        $schedule->call(function () {
+            \App\Services\AttendanceService::autoClockOut();
+        })->dailyAt('00:00');
     }
 
     /**

@@ -41,16 +41,6 @@
 </head>
 
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="{{ route('clients.create') }}">取引先マスター登録</a></li>
-                <li><a href="{{ route('document_types.create') }}">証票種別マスター登録</a></li>
-                <li><a href="{{ route('upload.form') }}">登録画面に戻る</a></li>
-            </ul>
-        </nav>
-    </header>
-
     <h1>アップロードされたファイルの一覧</h1>
 
     <form action="{{ route('files.index') }}" method="GET" id="searchForm">

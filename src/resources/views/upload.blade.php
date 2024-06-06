@@ -3,62 +3,15 @@
 
 <head>
     <title>ファイルアップロード</title>
-    <style>
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0, 0, 0);
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .form-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .form-group label {
-            margin-right: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/upload.css') }}">
 </head>
 
 <body>
     <header>
-        <nav>
-            <ul>
-                <li><a href="{{ route('clients.create') }}">取引先マスター登録</a></li>
-                <li><a href="{{ route('document_types.create') }}">証票種別マスター登録</a></li>
-                <li><a href="{{ route('files.index') }}">伝票一覧画面</a></li>
-            </ul>
+        <nav class="header-buttons">
+            <button onclick="location.href='{{ route('clients.create') }}'">取引先マスター登録</button>
+            <button onclick="location.href='{{ route('document_types.create') }}'">証票種別マスター登録</button>
+            <button onclick="location.href='{{ route('files.index') }}'">伝票一覧画面</button>
         </nav>
     </header>
 
@@ -127,26 +80,26 @@
         // モーダルを開く
         document.getElementById('openModal').onclick = function() {
             document.getElementById('myModal').style.display = "block";
-        }
+        }; // ここにセミコロンを追加
 
         // モーダルを閉じる
         document.getElementsByClassName('close')[0].onclick = function() {
             document.getElementById('myModal').style.display = "none";
-        }
+        }; // ここにセミコロンを追加
 
         // モーダル外をクリックすると閉じる
         window.onclick = function(event) {
             if (event.target == document.getElementById('myModal')) {
                 document.getElementById('myModal').style.display = "none";
             }
-        }
+        }; // ここにセミコロンを追加
 
         // 取引先を選択してフォームにセット
         document.getElementById('selectClient').onclick = function() {
             var selectedClient = document.getElementById('client_list').value;
             document.getElementById('client').value = selectedClient;
             document.getElementById('myModal').style.display = "none";
-        }
+        }; // ここにセミコロンを追加
 
         // 取引先の検索
         document.getElementById('client_search').addEventListener('input', function() {
