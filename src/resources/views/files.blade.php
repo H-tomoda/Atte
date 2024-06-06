@@ -95,6 +95,7 @@
                 <th>取引日付</th>
                 <th>取引先</th>
                 <th>取引金額</th>
+                <th>補足事項</th>
                 <th>アクション</th>
             </tr>
         </thead>
@@ -106,6 +107,7 @@
                 <td>{{ $file->transaction_date }}</td>
                 <td>{{ $file->client }}</td>
                 <td>{{ number_format($file->transaction_amount) }}円</td>
+                <td>{{ $file->remarks }}</td>
                 <td class="actions"><a href="{{ route('files.edit', $file->id) }}">編集</a></td>
             </tr>
             @endforeach
@@ -126,6 +128,5 @@
         });
     </script>
 </body>
-
 
 </html>
